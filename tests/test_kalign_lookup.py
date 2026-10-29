@@ -50,14 +50,17 @@ class KalignLookupTest(unittest.TestCase):
         self.assertIn("apt-get install kalign", message)
         self.assertIn("kalign3=3.3.5", message)
 
-    def test_templates_without_kalign_stop_before_the_model_is_built(self):
+    def test_templates_without_kalign_warn_and_still_build(self):
+        # Direct structural templates need no kalign; an .a3m or .hhr hit still
+        # fails on KalignError when it reaches Kalign.
         with tempfile.TemporaryDirectory() as d, \
              patch.dict(os.environ, {"PATH": d}), \
              patch.object(batch_inference, "InferenceRunner") as build, \
-             patch.object(batch_inference, "download_inference_cache"):
-            with self.assertRaises(RuntimeError):
-                batch_inference.get_default_runner(use_template=True)
-        build.assert_not_called()
+             patch.object(batch_inference, "download_inference_cache"), \
+             self.assertLogs(batch_inference.logger, level="WARNING") as logs:
+            batch_inference.get_default_runner(use_template=True)
+        build.assert_called_once()
+        self.assertIn("Kalign binary not found", "\n".join(logs.output))
 
     def test_mol_pred_has_no_kalign_path_option(self):
         with tempfile.TemporaryDirectory() as d:

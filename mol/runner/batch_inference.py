@@ -17,7 +17,7 @@
 # Based on Protenix: https://github.com/bytedance/Protenix
 # Upstream revision: bd54a05d047b8925a241056f36d619700604068a
 # Upstream file: runner/batch_inference.py
-# Changes: mol doctor, --device and local checkpoint paths; MSA search via ColabFold only; non-zero exit when an input fails.
+# Changes: mol doctor, --device and local checkpoint paths; MSA search via ColabFold only; non-zero exit when an input fails; structural templates without kalign (cytokineking/Protenix fork, 5847e38).
 
 import difflib
 import json
@@ -41,7 +41,7 @@ from mol.config.model_type import model_configs
 from ml_collections.config_dict import ConfigDict
 from mol.config.parser import parse_configs
 from mol.data.inference.json_maker import cif_to_input_json
-from mol.data.tools.kalign import find_kalign
+from mol.data.tools.kalign import KalignError, find_kalign
 from mol.data.utils import pdb_to_cif
 from mol.utils.logger import get_logger
 from mol.version import __version__
@@ -356,8 +356,16 @@ def get_default_runner(
     configs.need_atom_confidence = need_atom_confidence
     apply_memory_settings(configs, memory_settings or {})
     if use_template:
-        # Fail before the model loads, not on the first template hit.
-        find_kalign()
+        # Direct structural templates need no kalign, so its absence is only a
+        # warning here; an .a3m or .hhr hit still fails on KalignError.
+        try:
+            find_kalign()
+        except KalignError:
+            logger.warning(
+                "Kalign binary not found in system PATH. Direct structural templates "
+                "can still be used, but .hhr/.a3m template processing and online "
+                "template hits require a kalign executable in PATH."
+            )
 
     configs = update_gpu_compatible_configs(configs)
     logger.info(f"Inference by Mol-1: model={model_name}, dtype={configs.dtype}")
@@ -647,7 +655,10 @@ def mol_cli() -> None:
     "--use_template",
     type=bool,
     default=False,
-    help="Use templates: each protein chain's templatesPath, searched for chains without one.",
+    help=(
+        "Use templates: each protein chain's templatesPath, task-level structural "
+        "templates in the input JSON, and a search for chains with neither."
+    ),
 )
 @click.option(
     "--use_rna_msa",
@@ -820,8 +831,10 @@ def predict(
         logger.info("=" * 50)
         logger.info(
             "Using templates for inference. Template files should have "
-            ".hhr, .a3m or .json extensions and be specified in the JSON file.\n"
-            "Example: /path/to/template.hhr or /path/to/template.a3m\n"
+            ".hhr, .a3m, .json, .cif, .mmcif, or .pdb extensions and be "
+            "specified in the JSON file.\n"
+            "Examples: /path/to/template.hhr, /path/to/template.a3m, "
+            "/path/to/template.cif, or task-level structural templates.\n"
             "Note: Inference will proceed with automatic template search "
             "if none are provided and use_template is True."
         )

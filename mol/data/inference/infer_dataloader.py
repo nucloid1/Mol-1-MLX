@@ -17,6 +17,7 @@
 # Based on Protenix: https://github.com/bytedance/Protenix
 # Upstream revision: bd54a05d047b8925a241056f36d619700604068a
 # Upstream file: protenix/data/inference/infer_dataloader.py
+# Changes: task-level structural templates passed to the template featurizer (cytokineking/Protenix fork, 5847e38).
 
 import json
 import logging
@@ -162,6 +163,8 @@ class InferenceDataset(Dataset):
             atom_array=atom_array,
             use_template=self.use_template,
             online_template_featurizer=self.online_template_featurizer,
+            task_templates=single_sample_dict.get("templates"),
+            input_json_path=self.input_json_path,
         )
 
         # Make dummy features for not implemented features
