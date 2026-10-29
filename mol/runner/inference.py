@@ -90,6 +90,11 @@ class InferenceRunner(object):
             )
             torch.cuda.set_device(self.device)
         logging.info(f"Inference device: {self.device} (requested {requested!r})")
+        if not self.use_cuda and self.configs.dtype != "fp32":
+            logging.info(
+                f"dtype={self.configs.dtype} applies through CUDA autocast only; "
+                f"{self.device.type} runs fp32."
+            )
 
         if DIST_WRAPPER.world_size > 1:
             dist.init_process_group(backend="nccl")
@@ -525,9 +530,20 @@ def _peak_memory_mib(device: torch.device) -> float:
     """Peak allocated memory on ``device`` in MiB, or 0 where unavailable."""
     if device.type == "cuda":
         return torch.cuda.max_memory_allocated(device) / (1024 * 1024)
-    if device.type == "mps" and hasattr(torch.mps, "current_allocated_memory"):
-        return torch.mps.current_allocated_memory() / (1024 * 1024)
+    # MPS keeps no peak counter. Its driver pool only grows until
+    # _empty_device_cache runs after each system, so the pool size is that
+    # system's high-water mark; current allocation has already fallen back.
+    if device.type == "mps" and hasattr(torch.mps, "driver_allocated_memory"):
+        return torch.mps.driver_allocated_memory() / (1024 * 1024)
     return 0.0
+
+
+def _empty_device_cache(device: torch.device) -> None:
+    """Release cached allocator blocks between systems on CUDA or MPS."""
+    if device.type == "cuda":
+        torch.cuda.empty_cache()
+    elif device.type == "mps":
+        torch.mps.empty_cache()
 
 
 def _failure_hint(error: BaseException) -> str:
@@ -672,7 +688,7 @@ def infer_predict(runner: InferenceRunner, configs: Any) -> None:
                     f"Results saved to {configs.dump_dir}"
                 )
                 succeeded += 1
-                torch.cuda.empty_cache()
+                _empty_device_cache(runner.device)
             except Exception as e:
                 failures.append(f"{sample_name} [seed:{seed}]")
                 error_message = (
@@ -687,7 +703,7 @@ def infer_predict(runner: InferenceRunner, configs: Any) -> None:
                     encoding="utf-8",
                 ) as f:
                     f.write(error_message)
-                torch.cuda.empty_cache()
+                _empty_device_cache(runner.device)
         t1_end = time.time()
         logger.info(
             f"[Rank {DIST_WRAPPER.rank}] Seed {seed} completed in {t1_end - t1_start:.2f}s."

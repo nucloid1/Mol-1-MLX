@@ -106,7 +106,17 @@ class TestDeviceSelection(unittest.TestCase):
     def test_auto_prefers_cuda_then_mps_then_cpu(self):
         with patch.object(torch.cuda, "device_count", return_value=2):
             self.assertEqual(select_inference_device("auto", 1).type, "cuda")
-        with patch.object(torch.cuda, "device_count", return_value=0):
+        # Pin MPS both ways: the outcome must not depend on the host running the test.
+        with (
+            patch.object(torch.cuda, "device_count", return_value=0),
+            patch.object(torch.backends.mps, "is_built", return_value=True),
+            patch.object(torch.backends.mps, "is_available", return_value=True),
+        ):
+            self.assertEqual(select_inference_device("auto").type, "mps")
+        with (
+            patch.object(torch.cuda, "device_count", return_value=0),
+            patch.object(torch.backends.mps, "is_available", return_value=False),
+        ):
             self.assertEqual(select_inference_device("auto").type, "cpu")
 
     def test_explicit_unavailable_device_is_an_error_not_a_downgrade(self):
