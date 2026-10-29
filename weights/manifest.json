@@ -1,0 +1,122 @@
+{
+ "source": "/Users/ethanputnam/Mol-1/data_cache/checkpoint/mol-1-base.pt",
+ "dtypes_in_checkpoint": {
+  "torch.float32": 4048
+ },
+ "groups": {
+  "confidence_head": {
+   "file": "confidence_head.safetensors",
+   "keys": 248,
+   "params": 38398926,
+   "MiB": 146.5,
+   "ported": false
+  },
+  "diffusion_module": {
+   "file": "diffusion_module.safetensors",
+   "keys": 766,
+   "params": 206020465,
+   "MiB": 785.9,
+   "ported": false
+  },
+  "distogram_head": {
+   "file": "distogram_head.safetensors",
+   "keys": 2,
+   "params": 28736,
+   "MiB": 0.1,
+   "ported": false
+  },
+  "input_embedder": {
+   "file": "input_embedder.safetensors",
+   "keys": 93,
+   "params": 1041472,
+   "MiB": 4.0,
+   "ported": false
+  },
+  "layernorm_s": {
+   "file": "layernorm_s.safetensors",
+   "keys": 2,
+   "params": 768,
+   "MiB": 0.0,
+   "ported": false
+  },
+  "layernorm_z_cycle": {
+   "file": "layernorm_z_cycle.safetensors",
+   "keys": 2,
+   "params": 896,
+   "MiB": 0.0,
+   "ported": false
+  },
+  "linear_no_bias_s": {
+   "file": "linear_no_bias_s.safetensors",
+   "keys": 1,
+   "params": 147456,
+   "MiB": 0.6,
+   "ported": false
+  },
+  "linear_no_bias_sinit": {
+   "file": "linear_no_bias_sinit.safetensors",
+   "keys": 1,
+   "params": 172416,
+   "MiB": 0.7,
+   "ported": false
+  },
+  "linear_no_bias_token_bond": {
+   "file": "linear_no_bias_token_bond.safetensors",
+   "keys": 1,
+   "params": 448,
+   "MiB": 0.0,
+   "ported": false
+  },
+  "linear_no_bias_z_cycle": {
+   "file": "linear_no_bias_z_cycle.safetensors",
+   "keys": 1,
+   "params": 200704,
+   "MiB": 0.8,
+   "ported": false
+  },
+  "linear_no_bias_zinit1": {
+   "file": "linear_no_bias_zinit1.safetensors",
+   "keys": 1,
+   "params": 172032,
+   "MiB": 0.7,
+   "ported": false
+  },
+  "linear_no_bias_zinit2": {
+   "file": "linear_no_bias_zinit2.safetensors",
+   "keys": 1,
+   "params": 172032,
+   "MiB": 0.7,
+   "ported": false
+  },
+  "msa_module": {
+   "file": "msa_module.safetensors",
+   "keys": 229,
+   "params": 30804672,
+   "MiB": 117.5,
+   "ported": false
+  },
+  "pairformer_stack": {
+   "file": "pairformer_stack.safetensors",
+   "keys": 2610,
+   "params": 299268096,
+   "MiB": 1141.6,
+   "ported": false
+  },
+  "relative_position_encoding": {
+   "file": "relative_position_encoding.safetensors",
+   "keys": 1,
+   "params": 62272,
+   "MiB": 0.2,
+   "ported": false
+  },
+  "template_embedder": {
+   "file": "template_embedder.safetensors",
+   "keys": 89,
+   "params": 296960,
+   "MiB": 1.1,
+   "ported": false
+  }
+ },
+ "total_keys": 4048,
+ "total_params": 576788351
+}
