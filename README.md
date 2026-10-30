@@ -2,6 +2,9 @@
 
 <img src="assets/images/ribbon-mint-portrait.png" style="width: 100%; height: auto;" alt="Mol-1 overview">
 
+> **Apple silicon (MLX) fork.** Unofficial fork of [molence/Mol-1](https://github.com/molence/Mol-1) that adds [`mol-mlx/`](mol-mlx): Mol-1's recycling trunk (template embedder, MSA module, 48-block Pairformer) in [MLX](https://github.com/ml-explore/mlx) on the Metal GPU, with a hand-written Metal flash-attention kernel for triangle attention. `mol-mlx/bin/mol1-mlx pred ...` takes `mol pred`'s flags; the trunk runs in a worker process, and the input embedder, diffusion, confidence head and sampler stay in torch (fp32 throughout).
+> On an M3 Max (48 GB), the trunk is **1.46x faster than torch/MPS at 97 tokens, 1.59x at 256 and 2.0-2.1x at 320-384** (4 recycle cycles; torch's baseline is noisy). End to end the gain is smaller because diffusion is still torch: 1.27x at 97 tokens, warm; the first prediction in a process gains nothing. Confidences match torch to 3 decimals. The fork also includes two MPS commits on top of upstream (MPS memory release between systems; structural templates). Details: [`mol-mlx/HANDOFF.md`](mol-mlx/HANDOFF.md).
+
 
 
 
