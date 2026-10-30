@@ -333,6 +333,43 @@ read saves); chunking the transition to keep intermediates cache-resident (8-64 
 unchunked; the old separate-matmul transition got slower, 22 -> 24-27 ms). Tri-mul is now ~13.9 ms against a
 ~12 ms floor (5 projections 6.3 + contraction 2.2 + two layer norms 2.4 + output linear), so little is left.
 
+## Diffusion: the cache setting, not the compute, was most of the time (MEASURED; changes the port's case)
+
+I recommended porting diffusion because the default-settings run spent 562 of 1226 s (46%) in diffusion + confidence.
+Measuring a real denoising step first (`bench/diffusion_cache_probe.py`, real Mol-1 on MPS, trunk in the MLX worker,
+same model/features/seed, modes interleaved, `Mol1Oracle`'s other LARGE_INPUT_FLAGS applied) found that most of that
+time is repeated work caused by `diffusion_cache_mode=off`, which **`Mol1Oracle` sets above 400 tokens and which I
+added** (Mol-1's own "Large inputs" recipe keeps the default `full` and relies on the row chunking that only applies
+when the cache is on). With the cache off, every one of the 200 steps x 5 samples recomputes the N x N pair
+conditioning (896->448 projection + two 448-wide transitions), every block's pair-bias projection, and the atom-pair
+features. The oracle's flags were validated at 20 steps x 1 sample, where this costs ~10 s and is invisible.
+
+| N | cache full | cache off | off costs |
+| --- | --- | --- | --- |
+| 200 | ~137 ms/step | ~190 ms/step | 1.4x (N=200 run had no worker and no chunk flags) |
+| 384 | ~91 ms/step | ~250-265 ms/step | 2.7x |
+| 586 | ~145-151 ms/step | ~513-554 ms/step | **3.4-3.7x** |
+
+Per-step values include the one-time cache preparation amortised over only 20 steps, so the cache-on figures
+overstate the steady state. **Memory: no benefit from `off`.** Sampled torch MPS peak at N=586, one mode per
+process: 27.3 GiB (full) vs 27.0 GiB (off); the cache is ~1.1 GB resident and the peak is set elsewhere. (The
+sampled peak covers the whole process, so this bounds the cache-on increase at ~0.3 GiB.) The ~0.5 s/step the
+default-settings run showed is exactly the cache-off cost. Estimated effect of `full` on that run (NOT re-run end to
+end): diffusion ~500 s -> ~130-150 s, run ~1226 s -> ~860-880 s (-28 to -30%).
+
+**Scope:** only `Mol1Oracle` above 400 tokens. Protenix's `--enable_cache` defaults to true and `ProtenixOracle`
+does not override it, so the ~160 s Protenix oracle calls in the search runs were already cache-on.
+
+Component split of a cache-on denoiser call at N=200 (synced, ms/step): token transformer 38.7 (49%), atom attention
+encoder 22.9 (29%), atom decoder 13.6 (17%), s-conditioning 1.4; 78.5 total. The confidence head is negligible
+(~0.1 s at N=200, ~2 s at N=586). So a diffusion port would target the 24-block transformer and the atom attention;
+the confidence head is not worth porting.
+
+**What this does to the port's case:** with the cache on, diffusion at N=586 is ~130-150 s of an ~870 s run (~16%);
+an MLX diffusion port at 2x would save ~70 s (~8%). Weak. The case rests on the Protenix oracle (cache already on),
+where diffusion is plausibly 50-70% of a ~160 s call at N=287 (estimated from the cache-on per-step cost above, NOT
+measured on Protenix). Profile one Protenix call (vary `-p`, `-c`) before investing.
+
 ## NOT DONE
 
 The input embedder (atom attention encoder), the diffusion module (206M params, 200 steps x samples) and
