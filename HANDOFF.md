@@ -13,10 +13,8 @@ reading, not measured) or NOT DONE.
 > baseline is noisy). Diffusion and the confidence head are still torch. FlashIPA was not done (Mol-1 has no
 > IPA); see Scope.
 >
-> **Nothing here is committed.** `git init` was run but there are no commits. `refs/` (1.7 GB)
-> and `weights/` (2.1 GB) are gitignored and regenerable (see "Reproducing"). The Mol-1
-> checkout at `~/Mol-1` also carries its own uncommitted work; this port imports `mol` only
-> for featurization and for the reference captures.
+> `refs/` (1.7 GB) and `weights/` (2.1 GB) are gitignored and regenerable (see "Reproducing").
+> This port imports `mol` only for featurization and for the reference captures.
 
 ## Decisions made by the user
 
