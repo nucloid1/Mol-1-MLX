@@ -1,0 +1,7 @@
+#!/bin/sh
+# Mol-1's CLI with the MLX trunk. Point MOL_BIN (e.g. RFD4-Proteina's Mol1Oracle) at this file.
+# MOLMLX_PYTHON overrides the interpreter (needs mol, torch and mlx installed).
+HERE="$(cd "$(dirname "$0")/.." && pwd)"
+PY="${MOLMLX_PYTHON:-/opt/homebrew/Caskroom/miniforge/base/envs/mol1-mps/bin/python}"
+[ -x "$PY" ] || PY="$(command -v python3)"
+PYTHONPATH="$HERE${PYTHONPATH:+:$PYTHONPATH}" exec "$PY" -m mol_mlx.cli "$@"

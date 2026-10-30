@@ -1,0 +1,19 @@
+hard cap 10.0 GiB per process
+
+   N variant      cold s   warm s  held GiB   vs torch-mps
+  64 mlx-metal      0.31     0.29      1.67   
+  64 mlx-dense      0.41     0.29      1.68   
+  64 torch-mps      0.84     0.36      2.23   
+
+ 128 mlx-metal      1.19     1.18      2.90   
+ 128 mlx-dense      1.28     1.23      3.08   
+ 128 torch-mps      1.67     1.35      2.21   
+
+ 192 mlx-metal      2.80     2.79      3.76   
+ 192 mlx-dense      3.00     3.04      4.01   
+ 192 torch-mps      4.30     3.95      3.31   
+
+ 256 mlx-metal      5.19     5.17      4.47   
+ 256 mlx-dense      7.18     6.44      5.52   
+ 256 torch-mps      8.35     8.01      4.65   
+

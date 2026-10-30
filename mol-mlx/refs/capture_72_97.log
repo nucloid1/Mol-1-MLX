@@ -1,0 +1,25 @@
+2026-10-28 20:50:33,581 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Distributed environment: world size: 1, global rank: 0, local rank: 0
+2026-10-28 20:50:33,582 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:92] INFO root: Inference device: cpu (requested 'cpu')
+2026-10-28 20:50:33,582 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:94] INFO root: dtype=bf16 applies through CUDA autocast only; cpu runs fp32.
+2026-10-28 20:50:33,582 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:104] INFO root: Kernels will be compiled when fast_layernorm is first called.
+2026-10-28 20:50:33,582 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:108] INFO root: Finished environment initialization.
+2026-10-28 20:51:19,004 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Loading from /Users/ethanputnam/Mol-1/data_cache/checkpoint/mol-1-base.pt, strict: True
+2026-10-28 20:51:19,577 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Sampled key: module.input_embedder.atom_attention_encoder.linear_no_bias_ref_pos.weight
+2026-10-28 20:51:19,986 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Finish loading checkpoint.
+2026-10-28 20:51:19,990 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Model parameters: 576.79M
+2026-10-28 20:51:20,063 [/Users/ethanputnam/Mol-1/mol/data/inference/infer_dataloader.py:257] INFO mol.data.inference.infer_dataloader: Featurizing ref72...
+2026-10-28 20:51:24,354 [/Users/ethanputnam/Mol-1/mol/data/template/template_featurizer.py:920] INFO mol.data.template.template_featurizer: Calling InferenceTemplateFeaturizer.make_template_feature
+N=72: 99 tensors, 456 MiB -> /Users/ethanputnam/Mol-1-MLX/scripts/../refs/n72.npz
+2026-10-28 20:51:35,009 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Distributed environment: world size: 1, global rank: 0, local rank: 0
+2026-10-28 20:51:35,009 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:92] INFO root: Inference device: cpu (requested 'cpu')
+2026-10-28 20:51:35,009 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:94] INFO root: dtype=bf16 applies through CUDA autocast only; cpu runs fp32.
+2026-10-28 20:51:35,009 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:104] INFO root: Kernels will be compiled when fast_layernorm is first called.
+2026-10-28 20:51:35,009 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:108] INFO root: Finished environment initialization.
+2026-10-28 20:52:35,259 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Loading from /Users/ethanputnam/Mol-1/data_cache/checkpoint/mol-1-base.pt, strict: True
+2026-10-28 20:52:35,823 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Sampled key: module.input_embedder.atom_attention_encoder.linear_no_bias_ref_pos.weight
+2026-10-28 20:52:36,306 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Finish loading checkpoint.
+2026-10-28 20:52:36,310 [/Users/ethanputnam/Mol-1/mol/runner/inference.py:222] INFO mol.runner.inference: Model parameters: 576.79M
+2026-10-28 20:52:36,347 [/Users/ethanputnam/Mol-1/mol/data/inference/infer_dataloader.py:257] INFO mol.data.inference.infer_dataloader: Featurizing ref97...
+2026-10-28 20:52:36,452 [/Users/ethanputnam/Mol-1/mol/data/template/template_featurizer.py:920] INFO mol.data.template.template_featurizer: Calling InferenceTemplateFeaturizer.make_template_feature
+N=97: 99 tensors, 825 MiB -> /Users/ethanputnam/Mol-1-MLX/scripts/../refs/n97.npz
+exit 0
